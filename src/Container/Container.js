@@ -20,7 +20,10 @@ export default class Container extends React.Component {
   fetchData = async () => {
     try {
       const newImg = await fetch(API_URL);
-      if (this.state.loadedImages.includes(newImg.url)) {
+      if (
+        this.state.loadedImages[this.state.loadedImages.length - 1] ===
+        newImg.url
+      ) {
         this.setState({
           ...this.state,
           url: newImg.url,
@@ -32,6 +35,7 @@ export default class Container extends React.Component {
           url: newImg.url,
           imageChangedCounter: this.state.imageChangedCounter + 1,
           loadedImages: [...this.state.loadedImages, newImg.url],
+          duplicatedImageCounter: 0,
         });
       }
     } catch (err) {
@@ -77,14 +81,16 @@ export default class Container extends React.Component {
                 this.state.imageChangedCounter > 1 ? "s" : ""
               }`}</div>
             </div>
-            <div>
-              <div className='text-center'>
-                {this.state.duplicatedImageCounter}
+            {this.state.duplicatedImageCounter ? (
+              <div>
+                <div className='text-center'>
+                  {this.state.duplicatedImageCounter}
+                </div>
+                <div className='text-xs text-gray-700'>{`duplicated image${
+                  this.state.duplicatedImageCounter > 1 ? "s" : ""
+                }`}</div>
               </div>
-              <div className='text-xs text-gray-700'>{`duplicated image${
-                this.state.duplicatedImageCounter > 1 ? "s" : ""
-              }`}</div>
-            </div>
+            ) : null}
           </div>
           <div className='flex justify-center items-center'>
             <ImageContainer url={this.state.url} alt={""} />
