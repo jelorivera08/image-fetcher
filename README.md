@@ -1,4 +1,4 @@
-## Steps to run an instance in your loca
+## Steps to run an instance in your local
 
 - **Type the following commands in the folder root :**
 
