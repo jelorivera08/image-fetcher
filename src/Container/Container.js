@@ -17,13 +17,14 @@ export default class Container extends React.Component {
     };
   }
 
+  componentWillUnmount() {
+    clearInterval(this.containerInterval);
+  }
+
   fetchData = async () => {
     try {
       const newImg = await fetch(API_URL);
-      if (
-        this.state.loadedImages[this.state.loadedImages.length - 1] ===
-        newImg.url
-      ) {
+      if (this.state.loadedImages.includes(newImg.url)) {
         this.setState({
           ...this.state,
           url: newImg.url,
@@ -35,16 +36,11 @@ export default class Container extends React.Component {
           url: newImg.url,
           imageChangedCounter: this.state.imageChangedCounter + 1,
           loadedImages: [...this.state.loadedImages, newImg.url],
-          duplicatedImageCounter: 0,
         });
       }
     } catch (err) {
       console.error("Error during image url call: " + err);
     }
-
-    setTimeout(() => {
-      this.fetchData();
-    }, 1000);
   };
 
   handleClick = () => {
@@ -60,6 +56,7 @@ export default class Container extends React.Component {
       }));
 
       this.fetchData();
+      this.containerInterval = setInterval(this.fetchData, IMAGE_INTERVAL);
     }
   };
 
@@ -72,25 +69,32 @@ export default class Container extends React.Component {
             minWidth: "750px",
           }}
         >
-          <div className='flex justify-around items-center my-8'>
-            <div>
-              <div className='text-center'>
-                {this.state.imageChangedCounter}
-              </div>
-              <div className='text-xs text-gray-700'>{`new image${
-                this.state.imageChangedCounter > 1 ? "s" : ""
-              }`}</div>
-            </div>
-            {this.state.duplicatedImageCounter ? (
+          <div className='flex justify-center items-center my-8'>
+            <div
+              style={{
+                width: "640px",
+              }}
+              className='flex justify-around items-center '
+            >
               <div>
                 <div className='text-center'>
-                  {this.state.duplicatedImageCounter}
+                  {this.state.imageChangedCounter}
                 </div>
-                <div className='text-xs text-gray-700'>{`duplicated image${
-                  this.state.duplicatedImageCounter > 1 ? "s" : ""
+                <div className='text-xs text-gray-700'>{`new image${
+                  this.state.imageChangedCounter > 1 ? "s" : ""
                 }`}</div>
               </div>
-            ) : null}
+              {this.state.duplicatedImageCounter ? (
+                <div>
+                  <div className='text-center'>
+                    {this.state.duplicatedImageCounter}
+                  </div>
+                  <div className='text-xs text-gray-700'>{`duplicated image${
+                    this.state.duplicatedImageCounter > 1 ? "s" : ""
+                  }`}</div>
+                </div>
+              ) : null}
+            </div>
           </div>
           <div className='flex justify-center items-center'>
             <ImageContainer url={this.state.url} alt={""} />
